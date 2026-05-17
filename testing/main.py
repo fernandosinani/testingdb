@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
@@ -9,14 +10,21 @@ from schemas import StaffCreate, StaffResponse, StaffUpdate
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Company Staff Database")
+app = FastAPI(title="Kontakt info")
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.mount("/assets", StaticFiles(directory="../myhtml/dist/assets"), name="assets")
 
 
 @app.get("/")
 def serve_frontend():
-    return FileResponse("static/index.html")
+    return FileResponse("../myhtml/dist/index.html")
 
 
 @app.post("/staff", response_model=StaffResponse, status_code=201)
